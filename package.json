@@ -1,0 +1,20 @@
+{
+  "name": "servers",
+  "version": "1.0.0",
+  "description": "server examples",
+  "main": "index.cjs",
+  "private": true,
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "create:cert-files": "certs.sh"
+  },
+  "author": "gregclark2k11@gmail.com",
+  "license": "ISC",
+  "dependencies": {
+    "command-line-args": "^5.2.0",
+    "express": "^4.17.1",
+    "https": "^1.0.0",
+    "node-fetch": "^3.1.0",
+    "openssl": "^2.0.0"
+  }
+}
