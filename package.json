@@ -6,7 +6,9 @@
   "private": true,
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "create:cert-files": "certs.sh"
+    "setup": "setup:*",
+    "setup:certfiles": "certs.sh",
+    "run": "node --experimental-modules server.mjs --port 15776"
   },
   "author": "gregclark2k11@gmail.com",
   "license": "ISC",
