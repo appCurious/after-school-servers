@@ -33,12 +33,12 @@ import apiSettings from "./api-types.mjs";
  */
 const teachers = [
     {
-        id:1,
+        id: '1',
         name: 'Mrs. Maltida Hogan',
         age: 52
     },
     {
-        id: 2,
+        id: '2',
         name: 'Mr. Wollomar Niftaldi',
         age: 33
     }
@@ -50,7 +50,7 @@ const teachers = [
 const students = [
     {
         aboutMe: {
-            id: 1,
+            id: '1',
             name: 'Stephan Stefania',
             age: 12,
         },
@@ -64,7 +64,7 @@ const students = [
     },
     {
         aboutMe: {
-            id: 1,
+            id: '2',
             name: 'Tina Stefania',
             age: 12,
         },
@@ -78,7 +78,7 @@ const students = [
     },
     {
         aboutMe: {
-            id: 1,
+            id: '3',
             name: 'Rolanda Peters',
             age: 12,
         },
@@ -96,6 +96,63 @@ const students = [
     }
 ];
 
+const getterRoutes = [
+    {
+      path: "/afterschool/api/v1/student/:id",
+      operation: (req, res) => {
+          const id = req.params.id || null;
+          const student = students.filter((s) => {
+            return s.aboutMe.id === id;
+          });
+          if (student.length) {
+              res.send({
+                  success: true,
+                  result: student[0]
+              });
+          } else {
+              res.send({
+                  err: `no student has the id ${id}`
+              });
+          }
+      },
+    },
+    {
+      path: "/afterschool/api/v1/students/:range",
+      operation: (req, res) => {
+          let range = req.params.range || null;
+          if ( range && !isNaN(Number(range)) ) {
+              range = Number(range);
+              range = range < 0 ? 0 : range;              
+              range = range <= students.length ? range : students.length;
+              
+              // first record
+              if (range === 0) {
+                  return res.send({ 
+                    success: 'students found',
+                    result: {
+                        count: 1,
+                        students: [students[0]]
+                    }
+                });
+              }
+
+              const studentResult = students.slice(0,range);
+              
+              res.send({ 
+                  success: 'students found',
+                  result: {
+                      count: studentResult.length,
+                      students: studentResult
+                  }
+              });
+          } else {
+              res.send({ err: `no more records for students ${range}` });
+          }
+          
+      }
+    }
+  ];
+
 /**
  *
  * @param app
@@ -103,43 +160,7 @@ const students = [
 */
 const init = () => {
   apiSettings.get = [
-    ...[
-      {
-        path: "/afterschool/api/v1/student/:id",
-        operation: (req, res) => {
-            const id = req.params.id || null;
-            if (students[id]) {
-                res.send({
-                    success: true,
-                    result: students[id]
-                });
-            } else {
-                res.send({
-                    err: `no student has the id ${id}`
-                });
-            }
-        },
-      },
-      {
-        path: "/afterschool/api/v1/students/:range",
-        operation: (req, res) => {
-            const range = req.params.range || null;
-            if (range && Number(range) ) {
-                let last = range - 1;
-                last < 0 ? 0 : range;
-                last = last < students.length ? last : students.length -1;
-                const result = students.slice(0,last);
-                res.send({ 
-                    success: 'students found',
-                    result
-                });
-            } else {
-                res.send({ err: `no more records for students ${range}` });
-            }
-            
-        }
-      },
-    ],
+    ...getterRoutes,
     ...apiSettings.get,
   ];
 
@@ -147,4 +168,4 @@ const init = () => {
 };
 
 
-export default { init };
+export default { init, routesList: getterRoutes.map((r) => {return r.path})};

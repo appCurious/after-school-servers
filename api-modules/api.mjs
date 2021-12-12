@@ -12,13 +12,23 @@ import apiStudents from "./students-api.mjs";
 const init = (app) => {
   apiStudents.init();
 
+  // for each of the api's collect the routLists for display
+  const routesList = ['/afterschool/api/v1/list', ...apiStudents.routesList];
+
+  // default api routes
+  app.get('/afterschool/api/v1/list', (req, res) => {
+    res.send({
+        success: 'api routes',
+        result: routesList
+    });
+  });
   // apply api paths to the app
   apiSettings.get.forEach((setting) => {
     // console.log('what is setting ', setting)
     app.get(setting.path, setting.operation);
   });
 
-  return app;
+  return { app, routesList};
 };
 
 export default { init };
