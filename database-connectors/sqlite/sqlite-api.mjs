@@ -146,7 +146,6 @@ const destroy = async (connection) => {
 /**development */
 const main = async () => {
     const connection = await init ();
-    console.log('connection ', connection)
 };
 main();
 

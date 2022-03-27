@@ -36,12 +36,11 @@ const init = async (app, path) => {
   app.get('/afterschool/api/v1/list', (req, res) => {
     res.send({
         success: 'api routes',
-        result: routesList
+        result: ApiSettings.routesList
     });
   });
   // activate api routes
   ApiSettings.get.forEach((setting) => {
-    // console.log('what is setting ', setting)
     app.get(setting.path, setting.operation);
   });
 
