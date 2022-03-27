@@ -60,7 +60,7 @@ root/your-directory/after-school-servers> npm install
 ```
 
 ### Server Setup: self signed https certifications
-As of now this is not useful to the project.  Oh and liux / unix needs to run the cert file directly
+As of now this is not useful to the project.  Oh and linux / unix needs to run the cert file directly
 I am having issues with the self signed certs for HTTPS.  The raspberry pi doesn't like them very much.  It could be that I did not open or allow port 81 correctly.  But I wasn't able to run the server on that port.  Windows doesn't like them that much either but will serve using it.  Of course the browser will indicate it is not a secure site.  So with it not being secure and not being able to run I have changed the server to be HTTP instead.  Maybe I'll get the certifications running properly in the future.
 ### Windows
 ```
@@ -85,6 +85,9 @@ root/your-directory/after-school-servers> npm run run-linux
 ## View the Data
 The configured port can be updated on the package.json file.  Look at the package.json file and find the script you used to start the server.  When you interact with the API's below, be sure to change the configured port.
 When you started the server, there was a log in the terminal that provides the Url to use in the Browser.
+```
+server is running on http://localhost:15776/  from C:\codebase\AppCuriousDevelopers\after-school-servers\
+```
 
 ### Api List
  display a list of routes 
