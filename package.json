@@ -6,8 +6,8 @@
   "private": true,
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "setup": "setup:*",
-    "setup:certfiles": "certs.sh",
+    "setup-windows": "certs.sh",
+    "setup-linux": "sudo openssl req -x509 -newkey rsa:4096 -keyout key.pem -out cert.pem -sha256 -days 365 -nodes",
     "run-windows": "node --experimental-modules server.mjs --port 15776",
     "run-linux": "sudo node --experimental-modules server.mjs --port 8080"
   },

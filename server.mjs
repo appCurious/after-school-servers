@@ -64,24 +64,30 @@ const main = async () => {
   });
 
 
+  server = app.listen(options.port || 52121, function() {
+      console.log(`server is running on http://localhost:${server.address().port}/  from ${__dirname}`);
+  });
 
-  server = https
-    .createServer(
-      {
-        key: fs.readFileSync(__dirname + '/key.pem'),
-        cert: fs.readFileSync(__dirname + '/cert.pem'),
-      },
-      initialized.app
-    )
-    .listen(options.port || 52121, function () {
-      const host = server.address().address;
-      console.log(
-        'api running on https://%s:%s',
-        'localhost',
-        server.address().port
-      );
-    });
 };
+
+// // Self Signed Certs not really recognized as secure
+//   server = https
+//     .createServer(
+//       {
+//         key: fs.readFileSync(__dirname + '/key.pem'),
+//         cert: fs.readFileSync(__dirname + '/cert.pem'),
+//       },
+//       initialized.app
+//     )
+//     .listen(options.port || 52121, function () {
+//       const host = server.address().address;
+//       console.log(
+//         'api running on https://%s:%s',
+//         'localhost',
+//         server.address().port
+//       );
+//     });
+// };
 
 main();
 
