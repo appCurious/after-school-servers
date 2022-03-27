@@ -8,6 +8,7 @@ const homePage = html`<div>
     </div>
     
 </div>`;
+
 function init () {
     return homePage
 }

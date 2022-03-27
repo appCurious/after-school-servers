@@ -4,168 +4,192 @@
  * interact with a list of students
  *
 */
-import apiSettings from "./api-types.mjs";
 
 /**
- * A person object with a name and age.
+ * A person object with a name.
  * @typedef {Object<string, any>} Person
- * @property {string} id record id
- * @property {string} name The name of the person.
- * @property {number} age The age of the person.
+ * @property {string} ID record id
+ * @property {string} FirstName The name of the person.
+ * @property {string} LastName The name of the person.
  * 
 */
 
+
 /**
+ * A person object with a name.
+ * @typedef {Object<string, any>} Teacher
+ * @property {string} ID record id
+ * @property {string} FirstName The name of the person.
+ * @property {string} LastName The name of the person.
  * 
- * @typedef {Object<string, any>} EducationSubject
- * @property {string} classSubject
- * @property {Person} teacher
+*/
+// teachers should have classroom / students / maybe a schedule
+
+/**
+ * Class room has a SchoolSubject Teacher Students [] ClassPeriod SchoolDay
+ * (SchoolSubject, Teacher, Student, TimeOfDay, ClassPeriod, DayOfWeek, SchoolDay)
+ * @typedef {Object<string, any>} ClassRoom
+ * @property {int} ID record id
+ * @property {Person} Teacher teacher for the classroom
+ * @property {Student[]} Students list of students in the classroom
+ * @property {string} TimeOfDay textual display
+ * @property {int} ClassPeriod numeric hour ( easy to sort )
+ * @property {string} DayOfWeek textual display 
+ * @property {int} SchoolDay numeric day of the week ( easy to sort )
 */
 /**
- * 
+ * A person with an age and scoolclasses / maybe a schedule
+ * (ID, FirstName, LastName, Age, Grade)
  * @typedef {Object<string, any}Student
- * @property {EducationSubject[]} schoolClasses
- * @property {Person} aboutMe
+ * @property {string} ID record id
+ * @property {string} FirstName The name of the person.
+ * @property {string} LastName The name of the person.
+ * @property {int} Age The age of the student
+ * @property {int} Grade numeric grade the student is in
+ * 
 */
+// students should have classes
+// * @property {EducationSubject[]} schoolClasses
+//  * @property {Person} aboutMe
 
-/**
- * @type {Person[]} teachers
- */
-const teachers = [
-    {
-        id: '1',
-        name: 'Mrs. Maltida Hogan',
-        age: 52
-    },
-    {
-        id: '2',
-        name: 'Mr. Wollomar Niftaldi',
-        age: 33
-    }
-];
+const buildRoutes = (connection) => {
+        
+    const getterRoutes = [
+        {
+            path: '/afterschool/api/v1/students/:id',
+            operation: async (req, res) => {
+                const id = req.params.id || null;
 
-/**
- * @type {Student[]} students
- */
-const students = [
-    {
-        aboutMe: {
-            id: '1',
-            name: 'Stephan Stefania',
-            age: 12,
-        },
-        schoolClasses: [
-            {
-                classSubject: 'Math',
-                teacher: teachers[1]
-            }
-        ],
-        
-    },
-    {
-        aboutMe: {
-            id: '2',
-            name: 'Tina Stefania',
-            age: 12,
-        },
-        schoolClasses: [
-            {
-                classSubject: 'Math',
-                teacher: teachers[0]
-            }
-        ],
-        
-    },
-    {
-        aboutMe: {
-            id: '3',
-            name: 'Rolanda Peters',
-            age: 12,
-        },
-        schoolClasses: [
-            {
-                classSubject: 'Math',
-                teacher: teachers[1]
-            },
-            {
-                classSubject: 'English',
-                teacher: teachers[0]
-            }
-        ],
-        
-    }
-];
+                try {
+                    const db = await connection.open();
+                    const student = await db.get(`
+                        SELECT 
+                            ID,
+                            FirstName,
+                            LastName,
+                            Age,
+                            Grade
+                        FROM students WHERE ID = ?
+                    `, id);
 
-const getterRoutes = [
-    {
-      path: "/afterschool/api/v1/student/:id",
-      operation: (req, res) => {
-          const id = req.params.id || null;
-          const student = students.filter((s) => {
-            return s.aboutMe.id === id;
-          });
-          if (student.length) {
-              res.send({
-                  success: true,
-                  result: student[0]
-              });
-          } else {
-              res.send({
-                  err: `no student has the id ${id}`
-              });
-          }
-      },
-    },
-    {
-      path: "/afterschool/api/v1/students/:range",
-      operation: (req, res) => {
-          let range = req.params.range || null;
-          if ( range && !isNaN(Number(range)) ) {
-              range = Number(range);
-              range = range < 0 ? 0 : range;              
-              range = range <= students.length ? range : students.length;
-              
-              // first record
-              if (range === 0) {
-                  return res.send({ 
-                    success: 'students found',
-                    result: {
-                        count: 1,
-                        students: [students[0]]
+                    if (student?.ID) {
+                        res.send({
+                            success: true,
+                            result: student
+                        });
+                    } else {
+                        res.send({
+                            err: `no student has the id ${id}`
+                        });
                     }
-                });
-              }
 
-              const studentResult = students.slice(0,range);
-              
-              res.send({ 
-                  success: 'students found',
-                  result: {
-                      count: studentResult.length,
-                      students: studentResult
-                  }
-              });
-          } else {
-              res.send({ err: `no more records for students ${range}` });
-          }
-          
-      }
-    }
-  ];
+                    await connection.close();
+                    
+                } catch (e) {
+                    await connection.close();
+                    res.send({
+                        err: `woopsie. something went wrong ${e}`
+                    });
+                }
+                
+            },
+        },
+        {
+            path: '/afterschool/api/v1/students',
+            operation: async (req, res) => {
+                const {age, firstname, lastname, grade} = req.query;
+ 
+                try {
 
-/**
- *
- * @param app
- * @returns app
-*/
-const init = () => {
-  apiSettings.get = [
-    ...getterRoutes,
-    ...apiSettings.get,
-  ];
+                    let whereClause = '';
+                    const vals = [];
 
-  return apiSettings;
+                    if (!isNaN(Number(age))) {
+                        whereClause = ' Age = ? ';
+
+                        vals.push(age);
+                    }
+
+                    if (firstname) {
+                        whereClause += whereClause.length ? ' OR FirstName = ? ' : ' FirstName = ? ';
+                        vals.push(firstname);
+                    }
+
+                    if (lastname) {
+                        whereClause += whereClause.length ? ' OR LastName = ? ' : ' LastName = ? ';
+
+                        vals.push(lastname);
+                    }
+
+                    if (grade) {
+                        whereClause += whereClause.length ? ' OR Grade = ? ' : ' Grade = ? ';
+                        vals.push(grade);
+                    }
+
+                    whereClause = vals.length ? ` WHERE ${whereClause} `  : '';
+
+                    const db = await connection.open();
+                    const students = await db.all(`
+                        SELECT 
+                            ID,
+                            FirstName,
+                            LastName,
+                            Age,
+                            Grade
+                        FROM students ${whereClause}
+                    `, vals);
+
+                    if (students.length) {
+                        res.send({ 
+                            success: 'students found',
+                            result: {
+                                count: students.length,
+                                students: students
+                            }
+                        });
+                    } else {
+                        res.send({ err: `no more records for students ${firstname} ${lastname} ${age}` });
+                    }
+
+                    await connection.close();
+
+                } catch (e) {
+
+                    await connection.close();
+                    // woopsie
+                    res.send({
+                        err: `woopsie. something went wrong ${e}`
+                    });
+                }
+                
+            }
+        }
+    ];
+
+    return {
+        get: getterRoutes,
+        post: [],
+        put: [],
+        delete: []
+    };
+};
+
+const init = (dbconnection) => {
+    const routes = buildRoutes(dbconnection);
+    const settings = {
+        get: routes.get,
+        post: [], // no posts yet
+        routesList: [...routes.get.map((r) => {return r.path})] // no post routes at this time
+    };
+  
+
+    return settings;
+
+    // apiSettings.get = [
+    //     ...getterRoutes,
+    //     ...apiSettings.get,
+    //   ];
 };
 
 
-export default { init, routesList: getterRoutes.map((r) => {return r.path})};
+export default { init };

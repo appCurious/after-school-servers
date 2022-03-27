@@ -9,11 +9,12 @@
  * @type {Object<string, ApiSetting[]>}
  * @property {Array [ApiSetting]} get
  * @property {Array [ApiSetting]} post
+ * @property {Array [string] }  routesList
  */
 
 /**
  * @type {ApiSettings} apiSettings
  */
-const apiSettings = { get: [], post: [] };
+const apiSettings = { get: [], post: [], routesList: [] };
 
 export default apiSettings;
